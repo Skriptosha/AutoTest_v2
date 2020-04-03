@@ -68,6 +68,7 @@ public class DriverUtils implements DisposableBean {
         @Override
         protected void finished(Description description) {
             logger.info("Junit 4 finished");
+            quit(webDriver);
         }
     };
 
@@ -148,10 +149,18 @@ public class DriverUtils implements DisposableBean {
 
 
     @Override
-    public void destroy() throws Exception {
+    public void destroy() {
         logger.info("Destroy() вызван");
+//        quit(webDriver);
+    }
+
+    private void quit(WebDriver webDriver){
         if (webDriver != null) {
             webDriver.quit();
-        } else logger.severe("webDriver == null!");
+            logger.info("ВебДрайвер успешно уничтожен");
+        } else
+        {
+            logger.info("webDriver == null");
+        }
     }
 }

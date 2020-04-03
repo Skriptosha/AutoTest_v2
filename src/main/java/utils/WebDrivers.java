@@ -2,5 +2,8 @@ package utils;
 
 public enum WebDrivers {
     opera,
-    chrome
+    chrome,
+    firefox,
+    internetExplorer,
+    remote
 }
