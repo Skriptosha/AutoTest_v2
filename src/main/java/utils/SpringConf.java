@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 @Configuration
 @ComponentScan(basePackageClasses = {},
         basePackages = {"pages", "utils"}, lazyInit = true)
-@PropertySource({"classpath:MainSettings.properties", "classpath:firstPage.properties"
+@PropertySource({"classpath:mainSettings.properties", "classpath:firstPage.properties"
         , "classpath:secondPage.properties"})
 public class SpringConf {
 

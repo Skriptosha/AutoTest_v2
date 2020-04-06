@@ -144,7 +144,7 @@ public class DriverUtils implements DisposableBean {
             Files.createDirectories(Paths.get(Objects.requireNonNull(environment.getProperty("allure_result"))));
 
             properties.store(Files.newBufferedWriter(Paths.get(environment.getProperty("allure_result")
-                            + environment.getProperty("property_file")), StandardCharsets.UTF_8)
+                            + environment.getProperty("property_file")), StandardCharsets.US_ASCII)
                     , "Environment для отчета Allure 2");
 
             logger.fine("Файл environment.properties успешно сохранен");

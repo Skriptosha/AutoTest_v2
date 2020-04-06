@@ -2,6 +2,7 @@ package pages;
 
 import io.qameta.allure.*;
 import io.qameta.allure.junit4.DisplayName;
+import lombok.Getter;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +19,7 @@ import java.util.logging.Logger;
 @DisplayName("Первая страница")
 public class OnlineAppFirstPageTest extends TestUtils {
 
+    @Getter
     @Value("${urlIApp}")
     private String url;
 
