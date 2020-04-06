@@ -24,9 +24,8 @@ public class RandomNames {
         public static String MiddleName() {
                 return Middle[rand.nextInt(Middle.length)];
         }
-
         public static String LastName() {
-                return Middle[rand.nextInt(Last.length)];
+                return Last[rand.nextInt(Last.length)];
         }
 
 

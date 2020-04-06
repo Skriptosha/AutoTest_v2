@@ -20,6 +20,8 @@
         <allure-maven.version>2.10.0</allure-maven.version>
         <reportVersion>2.13.2</reportVersion>
 
+        <lombok.version>1.18.12</lombok.version>
+
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven.compiler.source>${maven.compiler.version}</maven.compiler.source>
         <maven.compiler.target>${maven.compiler.version}</maven.compiler.target>
@@ -27,9 +29,10 @@
         <project.reporting.outputEncoding>${project.encode}</project.reporting.outputEncoding>
 
         <spring.version>5.2.4.RELEASE</spring.version>
+        <javax.annotation.version>1.3.2</javax.annotation.version>
     </properties>
-    <dependencies>
 
+    <dependencies>
         <!-- Spring -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -45,6 +48,13 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <version>${spring.version}</version>
+        </dependency>
+
+        <!-- @PostConstruct -->
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>${javax.annotation.version}</version>
         </dependency>
 
         <!--Selenium-->
@@ -75,6 +85,14 @@
             <version>${allure-junit4.version}</version>
             <scope>compile</scope>
         </dependency>
+
+        <!--Ломбок для геттеров-->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -89,7 +107,6 @@
                     <excludes>
                     </excludes>
                     <includes>
-                        TEST1.java
                     </includes>
                     <testFailureIgnore>false</testFailureIgnore>
                     <skipTests>false</skipTests>
@@ -128,7 +145,4 @@
             </plugin>
         </plugins>
     </build>
-
-
-
 </project>
