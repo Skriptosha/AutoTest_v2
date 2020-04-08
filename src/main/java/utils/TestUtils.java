@@ -21,10 +21,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import pages.PageEnum;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -32,6 +28,9 @@ import java.util.logging.Logger;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {SpringConf.class})
 public class TestUtils {
+
+    public static final boolean TRUE = true;
+    public static final boolean FALSE = false;
 
     @Autowired
     private WebDriver webDriver;
@@ -78,14 +77,14 @@ public class TestUtils {
     };
 
     @BeforeClass
-    public static void begin() {
+    public static void setUp() {
     }
 
     @AfterClass
     public static void tearDown() {
-        DriverUtils driverUtils = SpringConf.getBean(DriverUtils.class);
-        driverUtils.quit(SpringConf.getBean(WebDriver.class));
-        driverUtils.setEnvironment();
+        WebDriver webDriver = SpringConf.getBean(WebDriver.class);
+        SpringConf.getBean(DriverUtils.class).quit(webDriver);
+        SpringConf.getBean(CommonUtils.class).setEnvironment(webDriver);
     }
 
     public String removeSymbols(@NonNull String exp) {
@@ -93,19 +92,23 @@ public class TestUtils {
     }
 
     /**
-     * Если необходимо сравнить исключительно буквы, без учета пробелов, тире и слешей.
+     * Проверка Assert.assertEquals. параметр expectedKey пытается найти в проперт файле,
+     * если не находит, пробует сначала сравнить параметры как есть, если результат false
+     * то удаляет символы (указаны в проперти по ключу regExp) через метод removeSymbols()
+     * и пробует сравнить повторно. Сравнивает как Текст, так и другие типы
      *
      * @param expectedKey ожидаемый Обьект
      * @param actual      Обьект, полученный на самом деле
      */
     public void assertEquals(Object expectedKey, Object actual) {
         if (expectedKey instanceof String && actual instanceof String) {
-            logger.info("actualKey: " + actual);
+            logger.info("actual: " + actual);
             String expected = environment.getProperty(String.valueOf(expectedKey));
+            logger.info("Значение из проперти файла: " + expected);
             if (expected == null) stepAssertEquals(expectedKey, actual);
             else {
                 if (expected.equals(actual)) stepAssertEquals(expected, actual);
-                else Assert.assertEquals(removeSymbols(expected), removeSymbols(String.valueOf(actual)));
+                else stepAssertEquals(removeSymbols(expected), removeSymbols(String.valueOf(actual)));
             }
         } else {
             stepAssertEquals(expectedKey, actual);
@@ -113,15 +116,23 @@ public class TestUtils {
     }
 
     @Step("Сравниваем значения")
-    private void stepAssertEquals(Object expected, Object actual){
+    private void stepAssertEquals(Object expected, Object actual) {
         Assert.assertEquals(expected, actual);
     }
 
     private String path;
 
-    public TestUtils performSendKeys(PageEnum page, String key) {
+    public TestUtils performSendKeys(PageEnum page, CharSequence... key) {
         path = page.getPath();
-        stepSendKeys(page.getLabel(), environment.getProperty(key));
+        logger.info("Размер массива key: " + key.length + "\n"
+                + "Значение key[0]: " + key[0].toString());
+        String value;
+        if (key.length == 1) {
+            value = environment.getProperty(key[0].toString());
+            stepSendKeys(page.getLabel(), value == null ? key[0] : value);
+        } else {
+            stepSendKeys(page.getLabel(), key);
+        }
         return this;
     }
 
@@ -144,20 +155,29 @@ public class TestUtils {
 
     public String performGetValue(PageEnum page) {
         this.path = page.getPath();
-        ;
         return stepGetValue(page.getLabel());
     }
 
-    public boolean performIsEnabled(PageEnum page) {
+    public void performAndAssertIsEnabled(PageEnum page, boolean expected) {
         this.path = page.getPath();
-        ;
-        return stepIsEnabled(page.getLabel());
+        if (expected) {
+            stepIsEnabledTrue(page.getLabel());
+        } else {
+            stepIsEnabledFalse(page.getLabel());
+        }
+    }
+
+    public void performAndAssertIsSelected(PageEnum page, boolean expected) {
+        this.path = page.getPath();
+        if (expected) {
+            stepIsSelectedTrue(page.getLabel());
+        } else {
+            stepIsSelectedFalse(page.getLabel());
+        }
     }
 
     @Step("Вводим в поле \"{0}\" значение \"{1}\"")
-    private void stepSendKeys(String label, String value) {
-        driverUtils.sendKeys(path, value);
-    }
+    private void stepSendKeys(String label, CharSequence... value) { driverUtils.sendKeys(path, value); }
 
     @Step("Нажимаем на элемент \"{0}\"")
     private void stepClick(String label) {
@@ -169,9 +189,28 @@ public class TestUtils {
         driverUtils.clear(path);
     }
 
-    @Step("Проверяем активен элемент \"{0}\" или не активен")
-    private boolean stepIsEnabled(String label) {
-        return driverUtils.findElement(path).isEnabled();
+    @Step("Проверяем что элемент \"{0}\" активен")
+    private void stepIsEnabledTrue(String label) {
+        Assert.assertTrue("Элемент " + label + "не активен!"
+                , driverUtils.findElement(path).isEnabled());
+    }
+
+    @Step("Проверяем что элемент \"{0}\" не активен")
+    private void stepIsEnabledFalse(String label) {
+        Assert.assertFalse("Элемент " + label + "активен!"
+                , driverUtils.findElement(path).isEnabled());
+    }
+
+    @Step("Проверяем что checkbox \"{0}\" выбран")
+    private void stepIsSelectedTrue(String label) {
+        Assert.assertTrue("Элемент " + label + "не выбран!"
+                , driverUtils.findElement(path).isSelected());
+    }
+
+    @Step("Проверяем что checkbox \"{0}\" не выбран")
+    private void stepIsSelectedFalse(String label) {
+        Assert.assertFalse("Элемент " + label + "не выбран!"
+                , driverUtils.findElement(path).isSelected());
     }
 
     @Step("Считывам текст из поля \"{0}\"")
@@ -180,24 +219,14 @@ public class TestUtils {
         return attachmentString(driverUtils.findElement(path).getText());
     }
 
-    @Step("Считывам значение атрибута \"value\" поля \"{0}\"")
+    @Step("Считывам значение атрибута \"value\" из поля \"{0}\"")
     private String stepGetValue(String label) {
-        logger.info("Считывам значение атрибута \"value\" поля: " + label);
+        logger.info("Считывам значение атрибута \"value\" из поля " + label);
         return attachmentString(driverUtils.findElement(path).getAttribute("value"));
     }
 
-    @Attachment(value = "Текст поля:", type = "text/plain")
+    @Attachment(value = "Текст считанного значения: \"{0}\"", type = "text/plain")
     public String attachmentString(String attachmentString) {
         return attachmentString;
-    }
-
-    public String getConsent(String key) {
-        try {
-            return new String(Files.readAllBytes(Paths.get(environment.getProperty(key))), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            logger.severe(e.getMessage());
-            e.printStackTrace();
-        }
-        return "";
     }
 }

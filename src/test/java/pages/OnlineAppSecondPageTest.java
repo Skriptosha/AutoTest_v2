@@ -3,7 +3,6 @@ package pages;
 import io.qameta.allure.*;
 import io.qameta.allure.junit4.DisplayName;
 import lombok.Getter;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,8 +50,7 @@ public class OnlineAppSecondPageTest extends TestUtils {
     public void testPassport(){
         onlineAppFirstPageTest.testPageFull();
         assertEquals("passport", performGetValue(SecondPageOnlineApp.PASSPORT));
-        Assert.assertTrue(environment.getProperty("errorMessage")
-                , performIsEnabled(SecondPageOnlineApp.PASSPORT));
+        performAndAssertIsEnabled(SecondPageOnlineApp.PASSPORT, FALSE);
     }
 
     @Test

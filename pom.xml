@@ -110,6 +110,9 @@
                     </includes>
                     <testFailureIgnore>false</testFailureIgnore>
                     <skipTests>false</skipTests>
+                    <systemPropertyVariables>
+                        <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
+                    </systemPropertyVariables>
                     <argLine>
                         -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
                     </argLine>
@@ -119,13 +122,8 @@
                             <value>io.qameta.allure.junit4.AllureJunit4</value>
                         </property>
                     </properties>
-<!--                    <systemProperties>-->
-<!--                        <property>-->
-<!--                            <name>allure.results.directory</name>-->
-<!--                            <value>allure-results</value>-->
-<!--&lt;!&ndash;                            ${project.build.directory}/&ndash;&gt;-->
-<!--                        </property>-->
-<!--                    </systemProperties>-->
+                    <systemProperties>
+                    </systemProperties>
                 </configuration>
                 <dependencies>
                     <dependency>

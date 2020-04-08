@@ -3,13 +3,13 @@ package pages;
 import io.qameta.allure.*;
 import io.qameta.allure.junit4.DisplayName;
 import lombok.Getter;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+import utils.CommonUtils;
 import utils.DriverUtils;
 import utils.TestUtils;
 
@@ -35,6 +35,9 @@ public class OnlineAppFirstPageTest extends TestUtils {
     @Autowired
     private Logger logger;
 
+    @Autowired
+    private CommonUtils commonUtils;
+
     @Before
     public void beginTest() {
         driverUtils.getURL(url);
@@ -51,6 +54,7 @@ public class OnlineAppFirstPageTest extends TestUtils {
     public void testFio(){
         performSendKeys(FirstPageOnlineApp.FIO, "fio_wrong");
         performSendKeys(FirstPageOnlineApp.FIO, "fio");
+        performSendKeys(FirstPageOnlineApp.SMS_CODE, "sms");
         assertEquals("fio", performGetValue(FirstPageOnlineApp.FIO));
         performClear(FirstPageOnlineApp.FIO);
     }
@@ -111,11 +115,12 @@ public class OnlineAppFirstPageTest extends TestUtils {
     public void testAgreeTerms() {
         performClick(FirstPageOnlineApp.AGREE_TERMS_ACCEPT);
         performClick(FirstPageOnlineApp.AGREE_TERMS_CONSENT);
-        logger.info(getConsent("consent_personalData"));
-        assertEquals(getConsent("consent_personalData"), performGetText(FirstPageOnlineApp.AGREE_TERMS_CONSENT_TEXT));
+        performAndAssertIsSelected(FirstPageOnlineApp.AGREE_TERMS_ACCEPT, TRUE);
+        performAndAssertIsEnabled(FirstPageOnlineApp.CONFIRM_DATA, TRUE);
+        assertEquals(commonUtils.getTextFromFile("consent_personalData"), performGetText(FirstPageOnlineApp.AGREE_TERMS_CONSENT_TEXT));
         performClick(FirstPageOnlineApp.AGREE_TERMS_ACCEPT);
-        Assert.assertFalse(environment.getProperty("errorMessage")
-                , performIsEnabled(FirstPageOnlineApp.CONFIRM_DATA));
+        performAndAssertIsSelected(FirstPageOnlineApp.AGREE_TERMS_ACCEPT, FALSE);
+        performAndAssertIsEnabled(FirstPageOnlineApp.CONFIRM_DATA, FALSE);
     }
 
     @Test
@@ -128,6 +133,7 @@ public class OnlineAppFirstPageTest extends TestUtils {
         performClick(FirstPageOnlineApp.CONFIRM_DATA);
         performSendKeys(FirstPageOnlineApp.SMS_CODE, "sms_wrong");
         performSendKeys(FirstPageOnlineApp.SMS_CODE, "sms");
+        performClear(FirstPageOnlineApp.SMS_CODE);
         assertEquals("sms", performGetValue(FirstPageOnlineApp.SMS_CODE));
         performClear(FirstPageOnlineApp.SMS_CODE);
     }
@@ -138,7 +144,13 @@ public class OnlineAppFirstPageTest extends TestUtils {
     @Stories({@Story("Валидаторы")})
     @DisplayName("Другие тесты")
     public void testOther() {
-
+        performSendKeys(FirstPageOnlineApp.FIO, "fio");
+        //performSendKeys(FirstPageOnlineApp.FIO, Keys.CONTROL, "A");
+        //performSendKeys(FirstPageOnlineApp.FIO, Keys.BACK_SPACE);
+        performClick(FirstPageOnlineApp.PHONE);
+        performClear(FirstPageOnlineApp.FIO);
+        performClick(FirstPageOnlineApp.FIO);
+        assertEquals("", performGetValue(FirstPageOnlineApp.FIO));
     }
 
     @Test
@@ -154,6 +166,13 @@ public class OnlineAppFirstPageTest extends TestUtils {
         performSendKeys(FirstPageOnlineApp.PHONE, "phone");
         performSendKeys(FirstPageOnlineApp.EMAIL, "email");
         performClick(FirstPageOnlineApp.AGREE_TERMS_ACCEPT);
+        assertEquals("fio", performGetValue(FirstPageOnlineApp.FIO));
+        assertEquals("birthDate", performGetValue(FirstPageOnlineApp.BIRTH_DATE));
+        assertEquals("passport", performGetValue(FirstPageOnlineApp.PASSPORT));
+        assertEquals("phone_check", performGetValue(FirstPageOnlineApp.PHONE));
+        assertEquals("email", performGetValue(FirstPageOnlineApp.EMAIL));
+        performAndAssertIsSelected(FirstPageOnlineApp.AGREE_TERMS_ACCEPT, TRUE);
+        performAndAssertIsEnabled(FirstPageOnlineApp.CONFIRM_DATA, TRUE);
         performClick(FirstPageOnlineApp.CONFIRM_DATA);
         performSendKeys(FirstPageOnlineApp.SMS_CODE, "sms");
         performClick(FirstPageOnlineApp.SEND);

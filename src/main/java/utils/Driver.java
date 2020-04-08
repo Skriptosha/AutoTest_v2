@@ -12,7 +12,6 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -29,18 +28,19 @@ public class Driver {
     private static final String DRIVER_PATH = "./drivers/";
     private static int timeout;
 
-    @Value("${browser}")
-    private WebDrivers webDrivers;
-
     @Autowired
     private Environment environment;
 
     @Autowired
     private Logger logger;
 
+    @Autowired
+    private CommonUtils commonUtils;
+
     @Bean
     public WebDriver initializationWebDriver() {
         WebDriver webDriver = null;
+        WebDrivers webDrivers = WebDrivers.valueOf(commonUtils.getParameter("browser").toLowerCase());
         logger.info("Драйвер выбран: " + webDrivers);
         switch (webDrivers) {
             case opera:
@@ -85,9 +85,12 @@ public class Driver {
         }
         logger.info("Драйвер успешно создан");
         assert webDriver != null;
-        timeout = Integer.parseInt(Objects.requireNonNull(environment.getProperty("timeout")));
+        timeout = Integer.parseInt(Objects.requireNonNull(commonUtils.getParameter("timeoutCurr")
+                .equalsIgnoreCase("High") ? environment.getProperty("timeoutHigh")
+                : environment.getProperty("timeoutLow")));
         webDriver.manage().window().maximize();
         webDriver.manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
+        logger.info("Таймаут установлен на " + timeout);
         return webDriver;
     }
 
