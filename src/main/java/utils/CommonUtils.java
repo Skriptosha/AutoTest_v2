@@ -4,7 +4,6 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -20,16 +19,14 @@ import java.util.logging.Logger;
 @Component
 public class CommonUtils {
 
-    @Autowired
-    Environment environment;
+    DataProvider env;
+
+    private final Logger logger;
 
     @Autowired
-    private Logger logger;
-
-    public String getParameter(String name) {
-        logger.info("Имя параметра: " + name);
-        return System.getProperty(name) == null ? environment.getProperty(name)
-                : System.getProperty(name);
+    public CommonUtils(DataProvider env, Logger logger) {
+        this.env = env;
+        this.logger = logger;
     }
 
     public void setEnvironment(WebDriver webDriver) {
@@ -42,13 +39,13 @@ public class CommonUtils {
             properties.setProperty("IPv4", Inet4Address.getLocalHost().getHostAddress());
             properties.setProperty("PlatForm", capabilities.getPlatform().name());
 
-            Path path = Paths.get(environment.getProperty("allure_result")
-                    + environment.getProperty("property_file"));
+            Path path = Paths.get(env.getProperty("allure_result")
+                    + env.getProperty("property_file"));
             logger.info("path: " + path);
 
             Files.deleteIfExists(path);
 
-            Files.createDirectories(Paths.get(Objects.requireNonNull(environment.getProperty("allure_result"))));
+            Files.createDirectories(Paths.get(Objects.requireNonNull(env.getProperty("allure_result"))));
             int count = 0;
             while (count < 4) {
                 try {
@@ -63,20 +60,47 @@ public class CommonUtils {
                 }
             }
         } catch (IOException e) {
-            logger.severe("Ошибка при записи файла " + environment.getProperty("allure_result")
-                    + environment.getProperty("property_file"));
+            logger.severe("Ошибка при записи файла " + env.getProperty("allure_result")
+                    + env.getProperty("property_file"));
             e.printStackTrace();
         }
     }
 
     public String getTextFromFile(String key) {
         try {
-            return new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(environment.getProperty(key))))
+            return new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(env.getProperty(key))))
                     , StandardCharsets.UTF_8);
         } catch (IOException e) {
             logger.severe(e.getMessage());
             e.printStackTrace();
         }
         return "";
+    }
+
+    public static String customReplaceAll(String expression, String newStr) {
+        String oldStr = "%d";
+        if ("".equals(expression) || oldStr.equals(newStr)) {
+            return expression;
+        }
+        if (newStr == null) {
+            newStr = "";
+        }
+        final int strLength = expression.length();
+        final int oldStrLength = oldStr.length();
+        StringBuilder builder = new StringBuilder(expression);
+
+        for (int i = 0; i < strLength; i++) {
+            int index = builder.indexOf(oldStr, i);
+
+            if (index == -1) {
+                if (i == 0) {
+                    return expression;
+                }
+                return builder.toString();
+            }
+            builder = builder.replace(index, index + oldStrLength, newStr);
+
+        }
+        return builder.toString();
     }
 }

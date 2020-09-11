@@ -1,15 +1,11 @@
 package utils;
 
 import io.qameta.allure.Step;
-import org.openqa.selenium.By;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -20,23 +16,29 @@ import java.util.logging.Logger;
 @Component
 public class DriverUtils implements DisposableBean {
 
-    @Autowired
-    private WebDriver webDriver;
+    private final WebDriver webDriver;
+
+    private final Logger logger;
+
+    private final DataProvider environment;
+
+    private final WebDriverWait webDriverWait;
 
     @Autowired
-    private Logger logger;
-
-    @Autowired
-    private Environment environment;
-
-    @Autowired
-    private WebDriverWait webDriverWait;
+    public DriverUtils(WebDriver webDriver, Logger logger, DataProvider environment, WebDriverWait webDriverWait) {
+        this.webDriver = webDriver;
+        this.logger = logger;
+        this.environment = environment;
+        this.webDriverWait = webDriverWait;
+    }
 
     public DriverUtils click(String path) {
         logger.info("Нажимаем на элемент " + path);
+        webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(path)));
         webDriverWait.until(webDriver1 -> {
             try {
                 webDriver1.findElement(By.xpath(path)).click();
+                //webDriverWait.until(webDriver2 -> webDriver2.findElement(By.xpath(path))).click();
             } catch (Exception e) {
                 return false;
             }
@@ -59,7 +61,8 @@ public class DriverUtils implements DisposableBean {
     }
 
     public DriverUtils sendKeys(String path, CharSequence... charSequences) {
-        logger.info("Печатаем текст " + Arrays.toString(charSequences));
+        logger.info("Печатаем текст " + Arrays.toString(charSequences) + ", элемент: " + path);
+        clear(path);
         webDriverWait.until(webDriver1 -> {
             try {
                 webDriver1.findElement(By.xpath(path)).sendKeys(charSequences);
@@ -78,6 +81,7 @@ public class DriverUtils implements DisposableBean {
 
     public List<WebElement> findElements(String path) {
         logger.info("Ищем элементы: " + path);
+        //webDriverWait.until(ExpectedConditions.presenceOfAllElementsLocatedBy())
         return webDriverWait.until(webDriver1 -> webDriver1.findElements(By.xpath(path)));
     }
 
@@ -92,13 +96,14 @@ public class DriverUtils implements DisposableBean {
         return this;
     }
 
-    @Step("Ждем исчезновения элемента {0}")
-    public DriverUtils staleness(WebElement webElement) {
+    @Step("Ждем исчезновения элемента {1}")
+    public DriverUtils staleness(String path, String label) {
+        WebElement webElement = webDriverWait.until(webDriver1 -> webDriver1.findElement(By.xpath(path)));
         try {
+            logger.info("Ждем изчезновения элемента: " + label);
             webDriverWait.until(ExpectedConditions.stalenessOf(webElement));
-            logger.info("Ждем изчезновения элемента: " + webElement.getText());
-        } catch (StaleElementReferenceException s) {
-            //
+        } catch (StaleElementReferenceException | NoSuchElementException s) {
+            logger.info(s.toString());
         }
         return this;
     }
@@ -118,6 +123,4 @@ public class DriverUtils implements DisposableBean {
             logger.info("webDriver == null");
         }
     }
-
-
 }

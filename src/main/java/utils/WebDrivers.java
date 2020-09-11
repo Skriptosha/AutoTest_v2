@@ -4,6 +4,6 @@ public enum WebDrivers {
     opera,
     chrome,
     firefox,
-    internetExplorer,
+    ie,
     remote
 }

@@ -21,6 +21,8 @@
         <reportVersion>2.13.2</reportVersion>
 
         <lombok.version>1.18.12</lombok.version>
+        <json.version>20190722</json.version>
+        <ibm.mq.version>9.1.5.0</ibm.mq.version>
 
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven.compiler.source>${maven.compiler.version}</maven.compiler.source>
@@ -93,6 +95,18 @@
             <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!--Работа с ИП-->
+        <dependency>
+            <groupId>com.ibm.mq</groupId>
+            <artifactId>com.ibm.mq.allclient</artifactId>
+            <version>${ibm.mq.version}</version>
+        </dependency>
+        <!--Работа с Json -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>${json.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -105,42 +119,44 @@
                     <forkCount>2</forkCount>
                     <reuseForks>true</reuseForks>
                     <excludes>
+                        **/OnlineAppFirstPageTest.java
+                        **/OnlineAppSecondPageTest.java
                     </excludes>
                     <includes>
                     </includes>
                     <testFailureIgnore>false</testFailureIgnore>
-                    <skipTests>false</skipTests>
+                    <!--<skipTests>false</skipTests>-->
                     <systemPropertyVariables>
-                        <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
-                    </systemPropertyVariables>
-                    <argLine>
-                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
-                    </argLine>
-                    <properties>
-                        <property>
-                            <name>listener</name>
-                            <value>io.qameta.allure.junit4.AllureJunit4</value>
-                        </property>
-                    </properties>
-                    <systemProperties>
-                    </systemProperties>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.aspectj</groupId>
-                        <artifactId>aspectjweaver</artifactId>
-                        <version>${aspectj.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-            <plugin>
-                <groupId>io.qameta.allure</groupId>
-                <artifactId>allure-maven</artifactId>
-                <version>${allure-maven.version}</version>
-                <configuration>
-                    <reportVersion>${reportVersion}</reportVersion>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-</project>
+                         <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
+                     </systemPropertyVariables>
+                     <argLine>
+                         -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+                     </argLine>
+                     <properties>
+                         <property>
+                             <name>listener</name>
+                             <value>io.qameta.allure.junit4.AllureJunit4</value>
+                         </property>
+                     </properties>
+                     <systemProperties>
+                     </systemProperties>
+                 </configuration>
+                 <dependencies>
+                     <dependency>
+                         <groupId>org.aspectj</groupId>
+                         <artifactId>aspectjweaver</artifactId>
+                         <version>${aspectj.version}</version>
+                     </dependency>
+                 </dependencies>
+             </plugin>
+             <plugin>
+                 <groupId>io.qameta.allure</groupId>
+                 <artifactId>allure-maven</artifactId>
+                 <version>${allure-maven.version}</version>
+                 <configuration>
+                     <reportVersion>${reportVersion}</reportVersion>
+                 </configuration>
+             </plugin>
+         </plugins>
+     </build>
+ </project>

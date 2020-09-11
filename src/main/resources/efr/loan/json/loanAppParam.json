@@ -1,0 +1,9 @@
+{
+  "creditProduct": "Кредит потребительский без обеспечения",
+  "amount": "1100000",
+  "term": "48",
+  "income": "50000",
+  "baseRate": "Все клиенты",
+  "allowances": "",
+  "matrixParam": "999900"
+}

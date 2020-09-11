@@ -18,18 +18,30 @@ import java.util.logging.Logger;
 
 @Configuration
 @ComponentScan(basePackageClasses = {},
-        basePackages = {"pages", "utils"}, lazyInit = true)
-@PropertySource({"classpath:mainSettings.properties", "classpath:firstPage.properties"
-        , "classpath:secondPage.properties"})
+        basePackages = {"pagesEFR", "utils", "testEFR"}, lazyInit = true)
+@PropertySource({
+        "classpath:mainSettings.properties",
+        "classpath:efr/BIQ6587.properties",
+        "classpath:efr/authorization.properties",
+        "classpath:efr/loan/properties/loanAppParameters.properties",
+        "classpath:efr/loan/properties/loanPersonalProfile.properties",
+        "classpath:efr/loan/properties/refLoanAppParameters.properties",
+        "classpath:efr/loan/properties/baseParameters.properties",
+
+})
 public class SpringConf {
 
-    @Autowired
-    private Environment environment;
+    private final Environment environment;
 
     private static SpringConf instance;
 
+    private final ApplicationContext applicationContext;
+
     @Autowired
-    private ApplicationContext applicationContext;
+    public SpringConf(Environment environment, ApplicationContext applicationContext) {
+        this.environment = environment;
+        this.applicationContext = applicationContext;
+    }
 
     @PostConstruct
     public void registerInstance() {
