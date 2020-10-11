@@ -1,0 +1,8 @@
+#Адрес ЕФР
+urlEFR : 'https://test02.rshb.ru/efrint'
+  #Адрес хота https://test02.rshb.ru:444/efrhot/
+  #ЕФР ИНТ https://test02.rshb.ru/efrint
+#Клиентские данные:
+client: 'alehinaNN'
+# Проверка на субпродукт
+byProduct6588 : '19,П1,00019'

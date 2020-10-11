@@ -62,7 +62,7 @@ public class DriverUtils implements DisposableBean {
 
     public DriverUtils sendKeys(String path, CharSequence... charSequences) {
         logger.info("Печатаем текст " + Arrays.toString(charSequences) + ", элемент: " + path);
-        clear(path);
+        //clear(path);
         webDriverWait.until(webDriver1 -> {
             try {
                 webDriver1.findElement(By.xpath(path)).sendKeys(charSequences);
@@ -75,12 +75,12 @@ public class DriverUtils implements DisposableBean {
     }
 
     public WebElement findElement(String path) {
-        logger.info("Ищем элемент: " + path);
+        //logger.info("Ищем элемент: " + path);
         return webDriverWait.until(webDriver1 -> webDriver1.findElement(By.xpath(path)));
     }
 
     public List<WebElement> findElements(String path) {
-        logger.info("Ищем элементы: " + path);
+        //logger.info("Ищем элементы: " + path);
         //webDriverWait.until(ExpectedConditions.presenceOfAllElementsLocatedBy())
         return webDriverWait.until(webDriver1 -> webDriver1.findElements(By.xpath(path)));
     }

@@ -1,0 +1,6 @@
+#Адрес ЕФР
+urlEFR : 'https://test02.rshb.ru:444/efrhot/'
+  #Адрес хота https://test02.rshb.ru:444/efrhot/
+  #ЕФР ИНТ https://test02.rshb.ru/efrint
+#Клиентские данные:
+client: 'ershovAN'

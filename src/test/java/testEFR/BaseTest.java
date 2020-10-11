@@ -1,39 +1,34 @@
 package testEFR;
 
+import efr.pagesEFR.AuthorizationPage;
+import efr.pagesEFR.BaseClass;
+import efr.pagesEFR.ClientsPage;
+import efr.pagesEFR.MainPage;
+import efr.testDataClient.TestClient;
 import io.qameta.allure.*;
 import io.qameta.allure.junit4.DisplayName;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import pagesEFR.AuthorizationPage;
-import pagesEFR.BaseClass;
-import pagesEFR.ClientsPage;
-import pagesEFR.MainPage;
 import utils.*;
 import utils.annotations.AfterHack;
 
+import java.io.IOException;
 import java.util.logging.Logger;
 
 @Component("BaseTest")
 @DisplayName("Набор базовых тестов для ЕФР")
 public class BaseTest extends TestUtils {
 
-    //@Rule
+    @Rule
     public JUnitUtils jUnitUtils;
-
     private DriverUtils driverUtils;
-
     private DataProvider env;
-
     private Logger logger;
-
     private CommonUtils commonUtils;
-
     private BaseClass baseClass;
-
-   // @Autowired
-   // public void setJUnitUtils(JUnitUtils jUnitUtils) { this.jUnitUtils = jUnitUtils; }
 
     @Autowired
     public void setDriverUtils(DriverUtils driverUtils) {
@@ -61,13 +56,13 @@ public class BaseTest extends TestUtils {
     }
 
     @Before
-    public void beginTest() {
+    public void beginTest() throws IOException {
+        env.loadYAML("src/main/resources/efr/baseTest/baseParam.yaml");
         driverUtils.getURL(env.getProperty("urlEFR"));
     }
 
     public void authorization(String login, String password){
         baseClass.choseSelect(AuthorizationPage.DOMEN, AuthorizationPage.GO.getPath());
-        performClear(AuthorizationPage.LOGIN.getPath(),AuthorizationPage.LOGIN.getLabel());
         performSendKeys(AuthorizationPage.LOGIN.getPath(),AuthorizationPage.LOGIN.getLabel(), login);
         performSendKeys(AuthorizationPage.PASSWORD.getPath(), AuthorizationPage.PASSWORD.getLabel(), password);
         performClick(AuthorizationPage.ENTER.getPath(),AuthorizationPage.ENTER.getLabel());
@@ -103,10 +98,11 @@ public class BaseTest extends TestUtils {
     @Stories({@Story("Авторизация"), @Story("Поиск клиента")})
     @DisplayName("Авторизация в системе ЕФР + Поиск клиента в ЕФР")
     @Description("Авторизация в системе ЕФР + Поиск клиента в ЕФР")
-    public void findClientTest(){
+    public void findClientTest() {
         authorization("loginEmp", "passwordEmp");
-        findClient("passSeriesBase", "passNumberBase");
-        assertEquals("fioBase"
+        TestClient testClient = env.getClient();
+        findClient(testClient.getPassportSeries(), testClient.getPassportNumber());
+        assertEquals(testClient.getFio()
                 , performGetText(AuthorizationPage.FIO_CLIENT.getPath(), AuthorizationPage.FIO_CLIENT.getLabel()));
     }
 }

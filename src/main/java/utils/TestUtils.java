@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import pagesOnlineApp.PageEnum;
 
 import java.util.Arrays;
 import java.util.List;
@@ -114,6 +113,11 @@ public class TestUtils {
         stepAssertTrueContains(contains, chek.contains(contains));
     }
 
+    public void assertFalseContains(String infoMessage, String chek, String contains) {
+        massage = infoMessage;
+        stepAssertFalseContains(contains, chek.contains(contains));
+    }
+
     /**
      * Замена символа %d в строке и поиск значения в тестовых данных, если такой имеется
      * Если параметр
@@ -148,6 +152,11 @@ public class TestUtils {
         Assert.assertTrue(massage, bool);
     }
 
+    @Step("Проверяем текст + \"{0}\"")
+    private void stepAssertFalseContains(String contains, Boolean bool) {
+        Assert.assertFalse(massage, bool);
+    }
+
     private WebElement webElement;
 
     public TestUtils performSendKeys(String pagePath, String pageLabel, CharSequence... key) {
@@ -157,8 +166,10 @@ public class TestUtils {
         String value;
         if (key.length == 1) {
             value = env.getProperty(key[0].toString());
+            driverUtils.clear(pagePath);
             stepSendKeys(pageLabel, pagePath, value == null ? key[0] : value);
         } else {
+            driverUtils.clear(pagePath);
             stepSendKeys(pageLabel, pagePath, key);
         }
         return this;
@@ -185,8 +196,10 @@ public class TestUtils {
         String value;
         if (key.length == 1) {
             value = env.getProperty(key[0].toString());
+            driverUtils.clear(pagePath);
             stepSendKeysParent(pageLabel, pagePath, value == null ? key[0] : value);
         } else {
+            driverUtils.clear(pagePath);
             stepSendKeysParent(pageLabel, pagePath, key);
         }
         return this;
@@ -242,6 +255,10 @@ public class TestUtils {
 
     public String performGetValue(String pagePath, String pageLabel) {
         return stepGetValue(pageLabel, pagePath);
+    }
+
+    public String performGetClass(String pagePath, String pageLabel) {
+        return stepGetClass(pageLabel, pagePath);
     }
 
     public void performAndAssertIsEnabled(String pagePath, String pageLabel, boolean expected) {
@@ -330,11 +347,20 @@ public class TestUtils {
     @Step("Считывам значение атрибута \"value\" из поля \"{0}\"")
     private String stepGetValue(String label, String pagePath) {
         logger.info("Считывам значение атрибута \"value\" из поля " + label);
-        return attachmentString(driverUtils.findElement(pagePath).getAttribute("value"));
+        String temp;
+        return attachmentString((temp = driverUtils.findElement(pagePath).getAttribute("value")) == null ? "" : temp);
+    }
+
+    @Step("Считывам значение атрибута \"class\" из поля \"{0}\"")
+    private String stepGetClass(String label, String pagePath) {
+        logger.info("Считывам значение атрибута \"class\" из поля " + label);
+        String temp;
+        return attachmentString((temp = driverUtils.findElement(pagePath).getAttribute("class")) == null ? "" : temp);
     }
 
     @Step(value = "Текст считанного значения: \"{0}\"")
     public String attachmentString(String attachmentString) {
+        logger.info("attachmentString " + attachmentString);
         return attachmentString;
     }
 }

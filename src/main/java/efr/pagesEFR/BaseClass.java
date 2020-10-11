@@ -1,15 +1,17 @@
-package pagesEFR;
+package efr.pagesEFR;
 
 import io.qameta.allure.Step;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import pagesOnlineApp.PageEnum;
 import utils.DataProvider;
 import utils.DriverUtils;
+import utils.PageEnum;
 import utils.TestUtils;
+
+import java.util.logging.Logger;
 
 @Component
 public class BaseClass {
@@ -18,31 +20,21 @@ public class BaseClass {
 
     private DriverUtils driverUtils;
 
-    private Actions actions;
+    private Logger logger;
 
     private DataProvider env;
 
-    @Autowired
-    public void setEnv(DataProvider env) { this.env = env; }
+    private String checkBox = "/span/span";
 
     @Autowired
-    public void setTestUtils(TestUtils testUtils) {
+    public BaseClass(TestUtils testUtils, DriverUtils driverUtils, Logger logger, DataProvider env) {
         this.testUtils = testUtils;
-    }
-
-    @Autowired
-    public void setDriverUtils(DriverUtils driverUtils) {
         this.driverUtils = driverUtils;
-    }
-
-    @Autowired
-    public void setActions(Actions actions) {
-        this.actions = actions;
+        this.logger = logger;
+        this.env = env;
     }
 
     private WebElement webElement;
-
-    private String firstRow = ".//tr";
 
     /**
      * Селект ЕФРа
@@ -53,9 +45,6 @@ public class BaseClass {
     public void choseSelect(PageEnum select, String value){
         String expected = env.getProperty(String.valueOf(value));
         stepChose(select.getLabel(), expected == null ? value : expected, select.getPath());
-        //testUtils.performClick(select);
-        //testUtils.performClick(MainPage.SELECT_EFR, value);
-        //driverUtils.click(testUtils.replacement(pathForSelect, value));
     }
 
     /**
@@ -89,6 +78,19 @@ public class BaseClass {
         //testUtils.performClick(MainPage.SELECT_EFR, value);
     }
 
+    /**
+     * Селект ЕФРа
+     *
+     * @param select элемент списка
+     * @param value значение которое надо выбрать в этом списке
+     */
+    public void choseSelectDaData(PageEnum select, String search, String value){
+        String expected = env.getProperty(String.valueOf(value));
+        testUtils.performSendKeys(select.getPath(), select.getLabel(), search);
+        driverUtils.sendKeys(select.getPath(), Keys.ARROW_RIGHT);
+        stepChoseDaData(select.getLabel(), expected == null ? value : expected);
+    }
+
     @Step("Выбираем из списка \"{0}\" значение \"{1}\"")
     private void stepChose(String select, String value, String path){
         driverUtils.click(path);
@@ -99,6 +101,11 @@ public class BaseClass {
     private void stepChoseSearch(String select, String value, String path){
         webElement.findElement(By.xpath(path)).click();
         driverUtils.click(testUtils.replacement(MainPage.SELECT_EFR.getPath(), value));
+    }
+
+    @Step("Выбираем из списка ДаДаты \"{0}\" значение \"{1}\"")
+    private void stepChoseDaData(String select, String value){
+        driverUtils.click(testUtils.replacement(MainPage.OPTIONS_CONTROL.getPath(), value));
     }
 
     StringBuilder stringBuilder = new StringBuilder("01234567890123456789");
@@ -129,24 +136,7 @@ public class BaseClass {
         return temp.contains(".") ? Integer.parseInt(temp.substring(0, temp.length() - 3)): Integer.parseInt(temp);
     }
 
-    /**
-     * Поиск в таблице ЕФРа
-     *
-     * @param row таблица
-     * @param value значение из строки в таблице
-     * @return WebElement на один шаг вверх по иерархии
-     */
-    public WebElement getRow(PageEnum row, String value){
-        return driverUtils.findElement(testUtils.replacement(row.getPath(), value));
-    }
-
-    public WebElement geFirstRow(PageEnum table){
-        /*WebElement webElement = driverUtils.findElement(table.getPath())
-                .findElement(By.xpath(firstRow));
-        actions.moveToElement(webElement).click().perform();
-        return webElement;
-         */
-        return driverUtils.findElement(table.getPath())
-                .findElement(By.xpath(firstRow));
+    public boolean isCheckBoxOn(PageEnum element){
+        return !testUtils.performGetClass(element.getPath().concat(checkBox), element.getLabel()).contains("disagree");
     }
 }

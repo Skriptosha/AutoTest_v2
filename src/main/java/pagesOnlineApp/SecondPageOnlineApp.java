@@ -1,6 +1,7 @@
 package pagesOnlineApp;
 
 import lombok.Getter;
+import utils.PageEnum;
 
 public enum SecondPageOnlineApp implements PageEnum {
 

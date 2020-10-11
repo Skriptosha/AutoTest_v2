@@ -32,6 +32,9 @@ allure-results/
 logs/
 log.*.txt
 
+#Clients
+src/main/resources/efr/clients/
+
 ### Maven ###
 target/
 pom.xml.tag

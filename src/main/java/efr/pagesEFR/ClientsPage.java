@@ -1,7 +1,7 @@
-package pagesEFR;
+package efr.pagesEFR;
 
 import lombok.Getter;
-import pagesOnlineApp.PageEnum;
+import utils.PageEnum;
 
 public enum ClientsPage implements PageEnum {
 

@@ -1,5 +1,7 @@
 package testEFR;
 
+import efr.pagesEFR.*;
+import efr.testDataClient.TestClient;
 import io.qameta.allure.*;
 import io.qameta.allure.junit4.DisplayName;
 import org.junit.Assert;
@@ -8,12 +10,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import pagesEFR.BaseClass;
-import pagesEFR.MainPage;
-import pagesEFR.PopulationCitiesPage;
 import utils.*;
 import utils.annotations.AfterHack;
 
+import java.io.IOException;
 import java.util.logging.Logger;
 
 @Component("BIQ6587")
@@ -22,20 +22,23 @@ public class BIQ6587 extends TestUtils {
 
     @Rule
     public JUnitUtils jUnitUtils;
-
     private DriverUtils driverUtils;
-
     private DataProvider env;
-
     private Logger logger;
-
     private CommonUtils commonUtils;
-
     private BaseClass baseClass;
-
     private BaseTest baseTest;
-
     private String[] names;
+    private LoanTools loanTools;
+    private TestClient testClient;
+    private boolean testPopulationCitiesEdit = false;
+    private Credit credit;
+
+    @Autowired
+    public void setCredit(Credit credit) { this.credit = credit; }
+
+    @Autowired
+    public void setLoanTools(LoanTools loanTools) { this.loanTools = loanTools; }
 
     @Autowired
     public void setJUnitUtils(JUnitUtils jUnitUtils) { this.jUnitUtils = jUnitUtils; }
@@ -71,13 +74,15 @@ public class BIQ6587 extends TestUtils {
     }
 
     @Before
-    public void beginTest() {
+    public void beginTest() throws IOException {
+        env.loadYAML("src/main/resources/efr/BIQ6587/BIQ6587.yaml");
+        testClient = env.getClient();
         driverUtils.getURL(env.getProperty("urlEFR"));
     }
 
     @Test
     @Epic("Тестирование UI")
-    @Feature("Справочник городов")
+    @Feature("BIQ 6587")
     @Stories({@Story("Справочник городов")})
     @DisplayName("Добавление новой записи в справочник городов")
     @Description("Добавление нового города в справочник + " + "Проверка на незаполненность полей + " +
@@ -141,8 +146,7 @@ public class BIQ6587 extends TestUtils {
 
         // удаляем запись
         performClick(PopulationCitiesPage.DELETE.getPath(), PopulationCitiesPage.DELETE.getLabel()
-                , performFind(replacement(PopulationCitiesPage.ROW.getPath(), "town1")
-                , PopulationCitiesPage.ROW.getLabel()));
+                ,performFind(replacement(PopulationCitiesPage.ROW.getPath(), "town1"), PopulationCitiesPage.ROW.getLabel()));
         performClick(PopulationCitiesPage.DELETE_YES.getPath(), PopulationCitiesPage.DELETE_YES.getLabel());
 
         // проверяем что удалилась
@@ -156,11 +160,12 @@ public class BIQ6587 extends TestUtils {
 
     @Test
     @Epic("Тестирование UI")
-    @Feature("Справочник городов")
+    @Feature("BIQ 6587")
     @Stories({@Story("Справочник городов")})
     @DisplayName("Редактирование текущей записи в справочнике городов")
     @Description("Редактирование текущего города в справочнике + " + "Проверка уникальности поля \"Код ФИАС\"")
     public void testPopulationCitiesEdit() {
+        testPopulationCitiesEdit = true;
         String temp;
         baseTest.authorization("loginEmpAdmin", "passwordEmpAdmin");
         performClick(MainPage.DICTIONARIES.getPath(), MainPage.DICTIONARIES.getLabel());
@@ -217,16 +222,56 @@ public class BIQ6587 extends TestUtils {
      */
     @AfterHack
     public void forTestPopulationCitiesEdit() {
-        performSendKeys(PopulationCitiesPage.REGION_SEARCH.getPath(), PopulationCitiesPage.REGION_SEARCH.getLabel(), "regionGNI2");
-        performClick(PopulationCitiesPage.SHOW.getPath(), PopulationCitiesPage.SHOW.getLabel());
-        performClick(PopulationCitiesPage.FIRST_ROW.getPath(), PopulationCitiesPage.FIRST_ROW.getLabel());
+        if (testPopulationCitiesEdit) {
+            performSendKeys(PopulationCitiesPage.REGION_SEARCH.getPath(), PopulationCitiesPage.REGION_SEARCH.getLabel(), "regionGNI2");
+            performClick(PopulationCitiesPage.SHOW.getPath(), PopulationCitiesPage.SHOW.getLabel());
+            performClick(PopulationCitiesPage.FIRST_ROW.getPath(), PopulationCitiesPage.FIRST_ROW.getLabel());
 
-        performSendKeys(PopulationCitiesPage.FIAS.getPath(), PopulationCitiesPage.FIAS.getLabel(), names[0]);
+            performSendKeys(PopulationCitiesPage.FIAS.getPath(), PopulationCitiesPage.FIAS.getLabel(), names[0]);
 
-        performSendKeys(PopulationCitiesPage.SIGN_NBSM.getPath(), PopulationCitiesPage.SIGN_NBSM.getLabel(), names[2]);
+            performSendKeys(PopulationCitiesPage.SIGN_NBSM.getPath(), PopulationCitiesPage.SIGN_NBSM.getLabel(), names[2]);
 
-        performSendKeys(PopulationCitiesPage.REGION.getPath(), PopulationCitiesPage.REGION.getLabel(), names[3]);
+            performSendKeys(PopulationCitiesPage.REGION.getPath(), PopulationCitiesPage.REGION.getLabel(), names[3]);
 
-        performClick(PopulationCitiesPage.SAVE_WHEN_EDIT.getPath(), PopulationCitiesPage.SAVE_WHEN_EDIT.getLabel());
+            performClick(PopulationCitiesPage.SAVE_WHEN_EDIT.getPath(), PopulationCitiesPage.SAVE_WHEN_EDIT.getLabel());
+        }
+    }
+
+    @Test
+    @Epic("Тестирование UI")
+    @Feature("BIQ 6587")
+    @Stories({@Story("Заявка на кредит для проверки субпродуктов")})
+    @DisplayName("Потребительский кредит")
+    @Description("Проверка субпродуктов + " + "проверка ставки согласно численности городов")
+    public void testByProductAndRate(){
+        baseTest.authorization("loginEmp", "passwordEmp");
+        baseTest.findClient(testClient.getPassportSeries(), testClient.getPassportNumber());
+
+        performClick(ClientsPage.APPLY_LOAN.getPath(), ClientsPage.APPLY_LOAN.getLabel());
+        //Инициация процесса
+        performClick(CreditPage.CONTINUE.getPath(), CreditPage.CONTINUE.getLabel());
+
+        //Кредитный калькулятор
+        credit.creditCalculateLoan(testClient);
+
+        //Проверяем ситенд для перехода к оформлению заявки
+        loanTools.isEFRINT();
+
+        // Указываем программу страхования
+        loanTools.addInsurance();
+
+        //Персональные данные
+        loanTools.addPersonalProfile(testClient);
+        performClick(CreditPage.CONTINUE.getPath(), CreditPage.CONTINUE.getLabel());
+        staleness(CreditPage.CONTINUE);
+
+        //Визуальная оценка
+        loanTools.addVisualEstimate(testClient);
+        performClick(CreditPage.CONTINUE.getPath(), CreditPage.CONTINUE.getLabel());
+
+        loanTools.getByproducts();
+
+        assertEquals("byProduct6587", performGetText(CreditPage.BYPRODUCT.getPath(), CreditPage.BYPRODUCT.getLabel()).substring(0, 11));
+        assertEquals("rate6587", performGetText(CreditPage.CREDIT_RATE.getPath(), CreditPage.CREDIT_RATE.getLabel()));
     }
 }

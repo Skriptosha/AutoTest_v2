@@ -1,7 +1,7 @@
-package pagesEFR;
+package efr.pagesEFR;
 
 import lombok.Getter;
-import pagesOnlineApp.PageEnum;
+import utils.PageEnum;
 
 public enum CreditPage implements PageEnum {
     //Основные элементы кредитной заявки - загрузка, продолжить и подтверждение
@@ -41,7 +41,8 @@ public enum CreditPage implements PageEnum {
     INSURANCE_AMOUNT("//input[@data-id='input-form-field-insuranceAmount']", "Страховая плата"),
 
     //Рефинансирование
-    REF_IS_ACTIVE("//div[@data-id='credit-calculator-view-form']/div/div", "Проверка блока рефинансирование"),
+    REF_BLOCK("//div[@class='display-table']/div", "Список кредитов на рефинансирование"),
+
     REF_ADD("//a[@data-id='link-create']", "Добавить"),
     REF_AMOUNT("//input[@data-id='input-amount%d']", "Рефинансируемые кредиты - сумма, строка %d"),
     REF_CURRENCY("//div[@data-id='select-currency%d']", "Рефинансируемые кредиты - валюта, строка %d"),

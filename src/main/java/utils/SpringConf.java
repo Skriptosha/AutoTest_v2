@@ -18,16 +18,10 @@ import java.util.logging.Logger;
 
 @Configuration
 @ComponentScan(basePackageClasses = {},
-        basePackages = {"pagesEFR", "utils", "testEFR"}, lazyInit = true)
+        basePackages = {"efr/pagesEFR", "utils", "testEFR"}, lazyInit = true)
 @PropertySource({
         "classpath:mainSettings.properties",
-        "classpath:efr/BIQ6587.properties",
-        "classpath:efr/authorization.properties",
-        "classpath:efr/loan/properties/loanAppParameters.properties",
-        "classpath:efr/loan/properties/loanPersonalProfile.properties",
-        "classpath:efr/loan/properties/refLoanAppParameters.properties",
-        "classpath:efr/loan/properties/baseParameters.properties",
-
+        "classpath:efr/authorization.yaml",
 })
 public class SpringConf {
 

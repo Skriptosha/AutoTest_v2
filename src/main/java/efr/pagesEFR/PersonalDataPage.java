@@ -1,7 +1,7 @@
-package pagesEFR;
+package efr.pagesEFR;
 
 import lombok.Getter;
-import pagesOnlineApp.PageEnum;
+import utils.PageEnum;
 
 public enum PersonalDataPage implements PageEnum {
 
@@ -9,6 +9,11 @@ public enum PersonalDataPage implements PageEnum {
     BORROWER_TAB("//a[@data-id='borrower-credit-tab']", "Заемщик"),
     //Персональные данные
     PERSONAL_DATA("//a[@data-id='personal-data-credit-tab']", "Персональные данные"),
+
+    IS_OUR_SALARY("//input[@data-id='toggle-form-field-isOurSalary']//..", "З/П-клиент"),
+    IS_OUR_PENS("//input[@data-id='toggle-form-field-isOurPension']//..", "Пенсия на счет в Банке"),
+    IS_P_CREDIT_HISTORY("//input[@data-id='toggle-form-field-isPositiveCreditHistory']//..", "Положительная КИ"),
+
     EDUCATION("//div[@data-id='select-form-field-education']", "Образование"),
     MILITARY_ID_YES("//div[@data-id='switcher-form-field-militaryCardtrue']", "Военный билет - Да"),
     PERIOD_RESIDENCE("//input[@data-id='input-form-field-residenceAddressTerm']", "Срок проживания по адресу, лет"),
@@ -19,13 +24,16 @@ public enum PersonalDataPage implements PageEnum {
     DEPENDANT_COUNT("//input[@data-id='input-form-field-dependantCount']", "Иных иждивенцев"),
     CONTACT_TEL_NUMBER("//input[@data-id='input-form-field-otherContactMemberPhone']", "Контактный телефон"),
     CONTACT_REFERENCE("//input[@data-id='input-form-field-otherContactMemberReference']", "Кем является Заемщику"),
+    CONTACT_REFERENCE_DIV("//div[@data-id='select-form-field-otherContactMemberReference']", "Кем является Заемщику - список"),
     FOR_SKFO_BLOCK("//div[@data-id='personal-data']/div/div", "Персональные данные"),
-    TEMPORARY_REGISTRATION_NO("//button[@data-id='switcher-form-field-temporaryRegistrationfalse']", "Временная регистрация - нет"),
-    OTHER_REGION_JOB_NO("//button[@data-id='switcher-form-field-otherRegionJobfalse']"
+    // БЛОК ДЛЯ СКФО
+    SKFO_TEMPORARY_REGISTRATION_NO("//button[@data-id='switcher-form-field-temporaryRegistrationfalse']", "Временная регистрация - нет"),
+    SKFO_OTHER_REGION_JOB_NO("//button[@data-id='switcher-form-field-otherRegionJobfalse']"
             , "Планируете ли Вы в период погашения кредита вести трудовую деятельность в другом субъекте РФ/в другой стране?* - нет"),
-    RELOCATION_PLAN_NO("//button[@data-id='switcher-form-field-relocationPlanfalse']"
+    SKFO_RELOCATION_PLAN_NO("//button[@data-id='switcher-form-field-relocationPlanfalse']"
             , "Планируете ли Вы переезд на ПМЖ в другой субъект РФ/в другую страну в ближайшее время? - нет"),
-    EDUCATION_PLACE("//div[@data-id='select-form-field-educationPlace']", "Место получения высшего образования"),
+    SKFO_EDUCATION_PLACE("//div[@data-id='select-form-field-educationPlace']", "Место получения высшего образования"),
+    SKFO_RUSSIAN_LEVEL("//span[text()='Уровень владения русским языком']/ancestor::div[3]//div[text()='%d']", "Уровень владения русским языком"),
 
     //Работа
     JOB_TAB("//a[@data-id='job-data-credit-tab']", "Работа"),
@@ -34,18 +42,20 @@ public enum PersonalDataPage implements PageEnum {
 
     JOB_INFO_BLOCK("//div[text()='Информация о местах работы']//..", "Информация о местах работы"),
     JOB_ADD("//a[@data-id='job-info-fieldset-sub-title-link']", "Добавить место работы"),
+    JOB_DELETE("//a[@data-id='remove-refinancing-credit-link']", "Удалить место работы"),
 
     ORGANIZATION_TYPE("//div[@data-id='select-form-field-organizationType']", "Тип организации"),
     OLF("//div[@data-id='select-form-field-organizationalAndLegalFormOfEmployer']", "ОПФ"),
     ORGANIZATION_NAME("//input[@data-id='input-form-field-organizationName']", "Наименование организации"),
     ORGANIZATION_INN("//input[@data-id='input-form-field-organizationInn']", "ИНН организации"),
-    INN_FIND("//input[@data-id='remove-refinancing-credit-link']", "Найти"),
+    INN_FIND("//span[text()='Найти']", "Найти"),
     ORGANIZATION_TEL("//input[@data-id='input-form-field-organizationPhone']", "Телефон работодателя"),
     EMPLOYEE_COUNT("//div[@data-id='select-form-field-employeeCount']", "Количество работающих в организации, чел"),
     CONTRACT_PERPETUAL("//button[@data-id='switcher-form-field-contractsType2']", "Трудовой договор - Бессрочный"),
     ACTIVITY_TYPE("//div[@data-id='select-form-field-activityType']", "Вид деятельности"),
     POSITION("//div[@data-id='select-form-field-position']", "Категория занимаемой должности"),
     // Адрес работы
+    COUNTRY_CHECK("//span[contains(@class, 'country-name')]", "Страна - Наименование"),
     COUNTRY_CHANGE("//div[@data-id='search-address-country-0-change-country']", "Страна - Изменить"),
     COUNTRY_NAME("//input[@data-id='countries-popup-input-filter']", "Название"),
     COUNTRY_SHOW("//button[@data-id='countries-popup-view']", "Показать"),
@@ -53,14 +63,16 @@ public enum PersonalDataPage implements PageEnum {
     ADDRESS("//input[@data-id='search-input-search-address-0']", "Адрес"),
     ADDRESS_MANUAL("//span[text()='Заполнить адрес вручную']/..", "Заполнить адрес вручную"),
     REGION("//input[@data-id='input-form-field-region']", "Регион"),
+    AREA("//input[@data-id='input-form-field-area']", "Район"),
     CITY("//input[@data-id='input-form-field-city']", "Город"),
     LOCALITY("//input[@data-id='input-form-field-locality']", "Населенный пункт"),
     STREET("//input[@data-id='input-form-field-street']", "Улица"),
     HOUSE_NUM("//input[@data-id='input-form-field-house']", "Номер дома"),
+    CONSTRUCTION("//input[@data-id='input-form-field-construction']", "Строение"),
+    BUILDING("//input[@data-id='input-form-field-housing']", "Корпус"),
+    APARTMENT("//input[@data-id='input-form-field-apartment']", "Номер квартиры"),
     INDEX("//input[@data-id='input-form-field-index']", "Индекс"),
     START_DATE_JOB("//input[@data-id='date-form-field-startDate-input']", "Дата начала работы в организации"),
-    //
-    OPTIONS_CONTROL("//ul[@class='options formcontrol']//*[text()='%d']", "ДаДата"),
 
     // Информация о стаже
     EXPERIENCE_YEARS("//input[@data-id='input-form-field-experience-years']", "Общий стаж (лет)"),
@@ -72,6 +84,7 @@ public enum PersonalDataPage implements PageEnum {
     //Доходы и расходы
     EXPENSES_TAB("//a[@data-id='incomes-expenses-data-credit-tab']", "Доходы и расходы"),
     CONFIRM_MAIN_REVENUE("//div[@data-id='confirm-docmainIncomeConfirmDocument']", "Способ подтверждения дохода по основному месту работы"),
+
     REVENUE_2NDFL("//a[@data-id='confirm-doc-link']", "Справка 2-НДФЛ"),
     REVENUE_DATE("//input[@data-id='InputDatePickerDataId-input']", "Дата справки"),
     REVENUE_NUMBER("//input[@data-id='0-number']", "Номер"),
@@ -82,9 +95,9 @@ public enum PersonalDataPage implements PageEnum {
     REVENUE_TABLE_ITEM(".//div[contains(@data-id, 'item')]", "Статья"),
     REVENUE_TABLE_AMOUNT(".//input[contains(@data-id, 'calculatorAmount')]", "Доход"),
 
-    //REVENUE_ADD("//div[@data-id='button-add-doc']", "Добавить"),
-
     MAIN_REVENUE_AMOUNT("//input[@data-id='input-form-field-avgAmount']", "Среднемесячный доход по основному месту работы"),
+    CONFIRM_PENS_REVENUE("//div[@data-id='confirm-docpensionIncomeConfirmDocument']", "Способ подтверждения пенсионных доходов"),
+    PENS_REVENUE_AMOUNT("//input[@data-id='input-form-field-pension']", "Пенсионные доходы"),
     MANDATORY_PAYMENTS("//input[@data-id='input-form-field-requiredPayments']", "Обязательные выплаты"),
     OTHER_PAYMENTS("//input[@data-id='input-form-field-otherExpenses']", "Прочие выплаты"),
 

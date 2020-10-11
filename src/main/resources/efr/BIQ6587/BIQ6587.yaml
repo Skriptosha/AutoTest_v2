@@ -1,0 +1,32 @@
+#Адрес ЕФР
+urlEFR : 'https://test02.rshb.ru:444/efrhot/'
+  #Адрес хота https://test02.rshb.ru:444/efrhot/
+  #ЕФР ИНТ https://test02.rshb.ru/efrint
+# Некорректные значения
+# Регион
+regionGNIWrong1: 'bb'
+# Признак для NBSM
+signNBSMWrong1: 'bb'
+
+# Валидаторы на поля
+fiasValidator: 'Поле "Код ФИАС" обязательно для заполнения'
+townValidator: 'Поле "Город" обязательно для заполнения'
+regionValidator: 'Поле "Регион ГНИ" обязательно для заполнения'
+signNBSMValidator: 'Поле "Признак для NBSM" обязательно для заполнения'
+fiasAlredyExistsMessage: 'Запись с таким кодом ФИАС уже существует'
+
+fias1: '7339e834-2cb4-4734-a4c7-1fca2c66e565'
+fias2exists: '7339e834-2cb4-4734-a4c7-1fca2c66e562'
+town1: 'Стерлитамак'
+regionGNI1: '02'
+signNBSM1: '1'
+
+fias2: '7339e834-2cb4-4734-a4c7-1fca2c66e567'
+town2: 'Казань г'
+regionGNI2: '05'
+regionGNI3: '16'
+signNBSM2: '5'
+
+# Проверка ставки и субпродукта
+byProduct6587: '19,П3,00010'
+rate6587: '7.5%'

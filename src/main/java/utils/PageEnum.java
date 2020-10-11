@@ -1,4 +1,4 @@
-package pagesOnlineApp;
+package utils;
 
 public interface PageEnum {
 
